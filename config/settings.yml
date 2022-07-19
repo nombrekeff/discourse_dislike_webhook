@@ -1,4 +1,4 @@
 plugins:
-  plugin_name_enabled:
+  discourse_remove_like_webhook_enabled:
     default: true
     client: true
