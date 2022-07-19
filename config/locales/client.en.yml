@@ -1,15 +1,11 @@
 en:
+  site_settings:
+    discourse_remove_like_webhook_enabled: "Enable the Remove Like Webhook plugin"
   js:
     discourse_remove_like_webhook:
       placeholder: placeholder
     admin:
       web_hooks:
         remove_like_event:
-          name: "asdasd Event"
-          details: "When a user marks a post as the accepted or unaccepted answer."
-  admin_js:
-    admin:
-      web_hooks:
-        remove_like_event:
-          name: "asdasd Event"
-          details: "When a user marks a post as the accepted or unaccepted answer."
+          name: "Like removed"
+          details: "When a user removes a like from a post."
