@@ -1,10 +1,9 @@
 # frozen_string_literal: true
-
 # name: discourse_remove_like_webhook
-# about: TODO
+# about: Adds a new webhook event for when a like is removed from a post
 # version: 0.0.1
-# authors: Discourse
-# url: TODO
+# authors: nombrekeff
+# url: https://github.com/nombrekeff/discourse_dislike_webhook
 # required_version: 2.7.0
 
 enabled_site_setting :discourse_remove_like_webhook_enabled
@@ -16,7 +15,6 @@ after_initialize do
     require_dependency 'post_actions_controller'
     class ::PostActionsController
         def destroy
-            print "destroy post action"
             result = PostActionDestroyer.new(
               current_user,
               Post.find_by(id: params[:id].to_i),
@@ -24,20 +22,7 @@ after_initialize do
             ).perform
 
             WebHook.enqueue_remove_like(result.post)
-            # payload ||= WebHook.generate_payload(:post, result.post)
-            # WebHook.enqueue_hooks(
-            #     :post_like_removed,
-            #     :post_like_removed,
-            #     id: result.post.id,
-            #     payload: {
-            #         post: result.post,
-            #         user: {
-            #             id: result.post.user.id,
-            #             username: result.post.user.username,
-            #         },
-            #     }.to_json,
-            # )
-
+            
             if result.failed?
               render_json_error(result)
             else
@@ -49,18 +34,20 @@ after_initialize do
     class ::WebHook
         def self.enqueue_remove_like(post)
             payload ||= WebHook.generate_payload(:post, post)
-            WebHook.enqueue_hooks(
-                :post_like_removed,
-                :post_like_removed,
-                id: post.id,
-                payload: {
-                    post: post,
-                    user: {
-                        id: post.user.id,
-                        username: post.user.username,
-                    },
-                }.to_json,
-            )
+            if active_web_hooks('post_like_removed').exists?
+                WebHook.enqueue_hooks(
+                    :post_like_removed,
+                    :post_like_removed,
+                    id: post.id,
+                    payload: {
+                        post: post,
+                        user: {
+                            id: post.user.id,
+                            username: post.user.username,
+                        },
+                    }.to_json,
+                )
+            end
         end
     end
 end
