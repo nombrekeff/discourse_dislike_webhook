@@ -24,11 +24,11 @@ after_initialize do
 
       action = PostAction.where(
         user_id: current_user.id,
-        post_id: post.id, 
+        post_id: post.id,
         post_action_type_id: @post_action_type_id
       ).with_deleted
-       .where("deleted_at IS NOT NULL")
-       .first
+      .where("deleted_at IS NOT NULL")
+      .first
 
       WebHook.enqueue_remove_like(result.post, action)
 
@@ -51,11 +51,11 @@ after_initialize do
       
         WebHook.enqueue_object_hooks(
           :like_removed,
-          action, 
-          :like_removed, 
+          action,
+          :like_removed,
           WebHookLikeSerializer,
-          group_ids: group_ids, 
-          category_id: category_id, 
+          group_ids: group_ids,
+          category_id: category_id,
           tag_ids: tag_ids
         )
       end
